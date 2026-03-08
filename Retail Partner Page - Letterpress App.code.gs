@@ -161,7 +161,7 @@ function getPublicStock() {
     const pendingMap = getPendingStockMap();
 
     const stockItems = itemsResult.items
-      .filter(item => (item.Active === true || item.Active === 'TRUE') && item.Status !== 'Retired')
+      .filter(item => item.Active !== false && item.Active !== 'FALSE' && item.Status !== 'Retired')
       .map(item => {
         const pending   = pendingMap[String(item.ItemID)] || 0;
         const available = Math.max(0, (parseInt(item.StartingAtHome) || 0) - pending);
@@ -180,7 +180,7 @@ function getPublicStock() {
           status:         item.Status || 'Open',
         };
       })
-      .filter(item => item.totalStock > 0);
+      ; // stock filter removed temporarily — add back: .filter(item => item.available > 0)
 
     return { success: true, items: stockItems };
   } catch (e) {
