@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prints by Angel — Retailer Stock List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       VARIABLES & RESET
+       ============================================================ */
+    :root {
+      --cream: #F5F0E4;
+      --cream-dark: #EDE7D6;
+      --white: #FFFFFF;
+      --teal: #4AABAB;
+      --teal-dark: #378A8A;
+      --teal-light: #E8F5F5;
+      --amber: #E8933A;
+      --amber-light: #FDF3E7;
+      --brown: #3D2B1F;
+      --brown-mid: #6B4C3B;
+      --brown-light: #A07860;
+      --coral: #E05C45;
+      --coral-light: #FEF0EE;
+      --green: #5A9E6F;
+      --green-light: #EBF5EF;
+      --border: #E2D9C8;
+      --shadow-sm: 0 1px 3px rgba(61,43,31,0.08);
+      --shadow-md: 0 4px 16px rgba(61,43,31,0.12);
+      --shadow-lg: 0 8px 32px rgba(61,43,31,0.16);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --transition: all 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .retailer-header {
+      background: #2C1F17;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-align: center;
+    }
+
+    .retailer-header-logo {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: #F0E6D3;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .retailer-header-logo span { color: var(--teal); }
+
+    .retailer-header-sub {
+      font-size: 0.8rem;
+      color: #C4A882;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* ============================================================
+       INSTRUCTIONS BANNER
+       ============================================================ */
+    .instructions-banner {
+      background: var(--teal-light);
+      border-bottom: 2px solid var(--teal);
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--teal-dark);
+    }
+
+    .instructions-banner strong { font-weight: 600; }
+
+    /* ============================================================
+       MAIN LAYOUT
+       ============================================================ */
+    .retailer-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* ============================================================
+       TOOLBAR (search + filter + view toggle)
+       ============================================================ */
+    .retailer-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.6rem 0.875rem 0.6rem 2.25rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      background: var(--white);
+      color: var(--brown);
+    }
+
+    .search-box input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(74,171,171,0.15); }
+    .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--brown-light); pointer-events: none; }
+
+    .view-toggle {
+      display: flex;
+      background: var(--cream-dark);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .view-toggle-btn {
+      width: 32px; height: 28px;
+      background: none; border: none;
+      cursor: pointer; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--brown-light); font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .view-toggle-btn.active { background: var(--white); color: var(--brown); box-shadow: var(--shadow-sm); }
+
+    /* Tag filter */
+    .tag-filter-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .tag-chip {
+      padding: 0.3rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      background: var(--white);
+      color: var(--brown-mid);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-body);
+    }
+
+    .tag-chip:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .tag-chip.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+    /* ============================================================
+       ITEMS GRID
+       ============================================================ */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .item-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .item-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .item-card.all-pending { opacity: 0.6; pointer-events: none; }
+
+    .item-card-image {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--cream-dark);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .item-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+    .item-card-image:hover img { transform: scale(1.04); }
+    .item-card-placeholder { font-size: 2.5rem; opacity: 0.3; }
+
+    .item-card-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(61,43,31,0);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+
+    .item-card-image:hover .item-card-image-overlay { background: rgba(61,43,31,0.15); }
+
+    .zoom-icon {
+      color: white;
+      font-size: 1.5rem;
+      opacity: 0;
+      transition: var(--transition);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .item-card-image:hover .zoom-icon { opacity: 1; }
+
+    .pending-banner {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: rgba(232,147,58,0.9);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .item-card-body { padding: 0.875rem; }
+
+    .item-card-id {
+      font-size: 0.65rem;
+      color: var(--teal);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-card-name {
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      color: var(--brown);
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .item-card-stock-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .stock-available { color: var(--green); font-weight: 600; }
+    .stock-pending { color: var(--amber); font-size: 0.72rem; }
+
+    /* Quantity selector on card */
+    .card-qty-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .qty-btn {
+      width: 28px; height: 28px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brown-mid);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .qty-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .qty-input {
+      width: 44px;
+      text-align: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--brown);
+      background: var(--white);
+    }
+
+    .qty-input:focus { outline: none; border-color: var(--teal); }
+
+    .add-to-request-btn {
+      flex: 1;
+      padding: 0.35rem 0.5rem;
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .add-to-request-btn:hover { background: var(--teal-dark); }
+    .add-to-request-btn.added { background: var(--green); }
+
+    /* List view */
+    .items-list-view { margin-bottom: 2.5rem; }
+
+    .list-item-row {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .list-item-thumb {
+      width: 56px; height: 72px;
+      border-radius: var(--radius-sm);
+      background: var(--cream-dark);
+      flex-shrink: 0;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .list-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .list-item-info { flex: 1; min-width: 0; }
+    .list-item-id { font-size: 0.65rem; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .list-item-name { font-family: var(--font-display); font-size: 0.95rem; color: var(--brown); }
+    .list-item-type { font-size: 0.78rem; color: var(--brown-light); margin-top: 0.1rem; }
+
+    .list-item-stock { text-align: center; min-width: 80px; }
+    .list-item-available { font-family: var(--font-display); font-size: 1.25rem; color: var(--green); }
+    .list-item-available-label { font-size: 0.65rem; color: var(--brown-light); text-transform: uppercase; }
+    .list-item-pending { font-size: 0.7rem; color: var(--amber); margin-top: 0.15rem; }
+
+    .list-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       LIGHTBOX
+       ============================================================ */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44,31,23,0.85);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+    }
+
+    .lightbox-overlay.open { display: flex; }
+
+    .lightbox-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      cursor: default;
+      animation: lightboxIn 0.2s ease;
+      box-shadow: var(--shadow-lg);
+    }
+
+    @keyframes lightboxIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .lightbox-image {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--cream-dark);
+      overflow: hidden;
+    }
+
+    .lightbox-image img { width: 100%; height: 100%; object-fit: cover; }
+    .lightbox-image-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 5rem; opacity: 0.2; }
+
+    .lightbox-body { padding: 1.5rem; }
+
+    .lightbox-id { font-size: 0.7rem; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+    .lightbox-name { font-family: var(--font-display); font-size: 1.5rem; color: var(--brown); margin-bottom: 1rem; line-height: 1.2; }
+
+    .lightbox-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .lightbox-stat {
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem;
+    }
+
+    .lightbox-stat-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brown-light); font-weight: 600; margin-bottom: 0.15rem; }
+    .lightbox-stat-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--brown); }
+
+    .lightbox-close-hint { font-size: 0.75rem; color: var(--brown-light); text-align: center; margin-top: 0.75rem; }
+
+    /* ============================================================
+       REQUEST CART / ORDER SUMMARY
+       ============================================================ */
+    .request-section {
+      background: var(--white);
+      border: 2px solid var(--teal);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .request-section-title {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+
+    .request-section-sub {
+      font-size: 0.875rem;
+      color: var(--brown-light);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Cart table */
+    .cart-empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--brown-light);
+      font-size: 0.875rem;
+      background: var(--cream);
+      border-radius: var(--radius-md);
+      border: 1.5px dashed var(--border);
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    .cart-table th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brown-light);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cart-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+
+    .cart-table tr:last-child td { border-bottom: none; }
+
+    .cart-item-id { color: var(--teal); font-weight: 700; font-size: 0.75rem; }
+    .cart-item-name { color: var(--brown); font-weight: 500; }
+
+    .cart-qty-input {
+      width: 60px;
+      text-align: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--brown);
+    }
+
+    .cart-qty-input:focus { outline: none; border-color: var(--teal); }
+
+    .cart-remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--coral);
+      font-size: 1rem;
+      padding: 0.25rem;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .cart-remove-btn:hover { background: var(--coral-light); }
+
+    .cart-line-price { color: var(--green); font-weight: 600; text-align: right; }
+
+    .cart-totals {
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: right;
+    }
+
+    .cart-totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: var(--brown-mid);
+      margin-bottom: 0.3rem;
+    }
+
+    .cart-totals-row.total {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--brown);
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .cart-estimate-note {
+      font-size: 0.72rem;
+      color: var(--brown-light);
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+
+    /* ============================================================
+       RETAILER INFO FORM
+       ============================================================ */
+    .form-divider {
+      border: none;
+      border-top: 2px dashed var(--border);
+      margin: 1.75rem 0;
+    }
+
+    .form-section-label {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--brown);
+      margin-bottom: 1rem;
+    }
+
+    .form-field { margin-bottom: 1rem; }
+
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--brown-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 0.65rem 0.875rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--brown);
+      background: var(--white);
+      transition: var(--transition);
+    }
+
+    .field-input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(74,171,171,0.15); }
+
+    .field-hint { font-size: 0.75rem; color: var(--brown-light); margin-top: 0.3rem; }
+
+    /* Retailer typeahead */
+    .retailer-search-wrap { position: relative; }
+
+    .retailer-dropdown {
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--white);
+      border: 1.5px solid var(--teal);
+      border-top: none;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .retailer-dropdown.open { display: block; }
+
+    .retailer-option {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--brown);
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .retailer-option:last-child { border-bottom: none; }
+    .retailer-option:hover { background: var(--teal-light); }
+
+    .retailer-option.not-found {
+      color: var(--brown-light);
+      font-style: italic;
+      cursor: pointer;
+    }
+
+    .retailer-option.not-found:hover { background: var(--amber-light); color: var(--amber); }
+
+    .selected-retailer-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--teal-light);
+      border: 1.5px solid var(--teal);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.875rem;
+      font-size: 0.9rem;
+      color: var(--teal-dark);
+      font-weight: 500;
+    }
+
+    .selected-retailer-change {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--teal);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary { background: var(--teal); color: white; }
+    .btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: var(--white); color: var(--brown); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { background: var(--cream); }
+    .btn-lg { padding: 0.875rem 2rem; font-size: 1rem; width: 100%; justify-content: center; }
+
+    /* ============================================================
+       MODALS (Review, Verify, New Partner Request)
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44,31,23,0.6);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: var(--cream);
+      border: none;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--brown-mid);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover { background: var(--coral-light); color: var(--coral); }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      color: var(--brown);
+      margin-bottom: 0.5rem;
+      padding-right: 2.5rem;
+    }
+
+    .modal-sub {
+      font-size: 0.875rem;
+      color: var(--brown-light);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Review order modal */
+    .review-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #2C1F17;
+      margin: -2rem -2rem 1.5rem;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .review-header-title {
+      font-family: var(--font-display);
+      color: #F0E6D3;
+      font-size: 1.1rem;
+    }
+
+    .review-header-sub { color: #C4A882; font-size: 0.78rem; margin-top: 0.2rem; }
+
+    .review-items-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    .review-items-table th { text-align: left; padding: 0.5rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brown-light); border-bottom: 1px solid var(--border); }
+    .review-items-table td { padding: 0.65rem 0.5rem; font-size: 0.875rem; border-bottom: 1px solid var(--border); }
+    .review-items-table tr:last-child td { border-bottom: none; }
+
+    .review-totals { background: var(--cream); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.25rem; }
+    .review-total-row { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--brown-mid); margin-bottom: 0.3rem; }
+    .review-total-row.grand { font-size: 1rem; font-weight: 700; color: var(--brown); border-top: 1px solid var(--border); padding-top: 0.5rem; margin-top: 0.3rem; }
+    .review-estimate-note { font-size: 0.72rem; color: var(--brown-light); margin-top: 0.25rem; }
+
+    .consignment-note {
+      background: var(--green-light);
+      border: 1px solid var(--green);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.825rem;
+      color: var(--green);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Verify modal */
+    .verify-icon { font-size: 3rem; text-align: center; margin-bottom: 0.75rem; }
+
+    .verify-error {
+      background: var(--coral-light);
+      border: 1px solid var(--coral);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.825rem;
+      color: var(--coral);
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    .verify-error.show { display: block; }
+
+    /* New partner request modal */
+    .partner-request-type-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .type-option {
+      flex: 1;
+      padding: 0.875rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .type-option.selected { border-color: var(--teal); background: var(--teal-light); }
+    .type-option-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .type-option-label { font-size: 0.8rem; font-weight: 600; color: var(--brown); }
+    .type-option-desc { font-size: 0.72rem; color: var(--brown-light); margin-top: 0.15rem; }
+
+    .region-note {
+      font-size: 0.75rem;
+      color: var(--brown-light);
+      margin-top: 0.3rem;
+    }
+
+    .not-in-region-note {
+      background: var(--amber-light);
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.875rem;
+      font-size: 0.8rem;
+      color: var(--amber);
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    /* Success screen */
+    .success-screen {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .success-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--brown); margin-bottom: 0.5rem; }
+    .success-sub { font-size: 0.875rem; color: var(--brown-light); max-width: 320px; margin: 0 auto; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--brown);
+      color: var(--cream);
+      padding: 0.75rem 1.5rem;
+      border-radius: 100px;
+      font-size: 0.875rem;
+      z-index: 700;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--green); }
+    .toast.error-toast { background: var(--coral); }
+
+    /* Form status */
+    .form-status {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.875rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .form-status.success { background: var(--green-light); color: var(--green); display: block; }
+    .form-status.error { background: var(--coral-light); color: var(--coral); display: block; }
+    .form-status.loading { background: var(--cream-dark); color: var(--brown-mid); display: block; }
+
+    /* Loading state */
+    .page-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .dog-png-wrap { width: 140px; height: 140px; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; position: relative; }
+    .dog-png { width: 130px; height: 130px; object-fit: contain; }
+    .dog-bounce { animation: dogBounce 1.2s ease-in-out infinite; }
+    .dog-state { display:flex; flex-direction:column; align-items:center; padding:3rem 1rem; text-align:center; }
+    .dog-message { font-size:0.9rem; color:#A07860; margin-top:0.5rem; }
+    .dog-message.error { color:#E05C45; }
+    .dog-badge { position:absolute; top:-8px; right:-12px; border-radius:10px; padding:0.3rem 0.5rem; font-size:0.65rem; font-weight:800; line-height:1.3; box-shadow:0 2px 8px rgba(0,0,0,0.18); }
+    .dog-badge-error { background:#E05C45; color:white; text-transform:uppercase; letter-spacing:0.05em; }
+    .dog-badge-empty { background:white; border:2px solid #4AABAB; padding:0.25rem; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+
+    @keyframes dogBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .dog-dots { display: flex; gap: 6px; margin-bottom: 0.5rem; }
+    .dog-dots .dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; animation: dotPulse 1.2s ease-in-out infinite; }
+    .dog-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dog-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .loading-message { font-size: 0.875rem; color: var(--brown-light); font-weight: 500; }
+
+    /* Footer */
+    .retailer-footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.75rem;
+      color: var(--brown-light);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-teal { background: var(--teal-light); color: var(--teal-dark); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 768px) {
+      .retailer-main { padding: 1.25rem 1rem; }
+      .items-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .request-section { padding: 1.25rem; }
+      .modal { padding: 1.5rem; }
+      .review-header { margin: -1.5rem -1.5rem 1.25rem; padding: 1.25rem 1.5rem; }
+      .list-item-row { flex-wrap: wrap; }
+      .list-item-actions { width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .items-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+      .retailer-header { padding: 1.25rem 1rem; }
+      .tag-filter-wrap { gap: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="retailer-header">
+    <div class="retailer-header-logo">
+      <span>✦</span> Prints by Angel
+    </div>
+    <div class="retailer-header-sub">Retailer Stock List</div>
+  </header>
+
+  <!-- Instructions Banner -->
+  <div class="instructions-banner">
+    👋 Browse available designs below. <strong>Select a quantity and add cards to your request,</strong> then complete the request form at the bottom to submit.
+  </div>
+
+  <!-- Main -->
+  <main class="retailer-main" id="retailer-main">
+    <!-- Loaded dynamically -->
+    <div class="page-loading" id="initial-loading">
+      <div class="dog-png-wrap">
+        <img src="doggycutetonguev2.png" class="dog-png dog-bounce" alt="Loading...">
+      </div>
+      <div class="dog-dots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="loading-message">Loading available cards...</div>
+    </div>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <div class="lightbox-card" id="lightbox-card">
+      <div class="lightbox-image" id="lightbox-image"></div>
+      <div class="lightbox-body" id="lightbox-body"></div>
+    </div>
+  </div>
+
+  <!-- Modal (review / verify / new partner) -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM4FR2fzJ9LAE7w1R-J9u0-6V6HSBP5om2NsX59D8-fCH045rVvLvKMZBia8PX5zME/exec';
+    const VA_SALES_TAX = 0.053;
+    const CONSIGNMENT_REGIONS = [
+      'Harrisonburg Area',
+      'Staunton / Waynesboro Area',
+      'Rockbridge County Area',
+      'Roanoke / Salem Area',
+      'Charlottesville Area',
+      'Richmond Metro',
+      'Blacksburg VA'
+    ];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let allItems = [];
+    let filteredItems = [];
+    let cart = {}; // { itemId: { item, qty } }
+    let selectedRetailer = null; // { value, label, city, partnerType, ... }
+    let isGridView = true;
+    let activeTagFilter = null;
+    let allTags = [];
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      setupLightbox();
+      setupModal();
+      await loadStock();
+    });
+
+    async function loadStock() {
+      try {
+        const [stockRes, tagsRes] = await Promise.all([
+          fetch(`${SCRIPT_URL}?action=getPublicStock`).then(r => r.json()),
+          fetch(`${SCRIPT_URL}?action=getTags`).then(r => r.json()),
+        ]);
+
+        if (!stockRes.success) throw new Error(stockRes.error || 'Failed to load stock');
+
+        allItems = stockRes.items || [];
+        filteredItems = [...allItems];
+        if (tagsRes.success) allTags = tagsRes.tags || [];
+
+        renderPage();
+      } catch (e) {
+        document.getElementById('initial-loading').innerHTML = `
+          <div class="dog-state">
+            <div class="dog-png-wrap">
+              <img src="doggycutetonguev2.png" class="dog-png" alt="Error" style="filter:grayscale(30%);">
+              <div class="dog-badge dog-badge-error">WTF?!<br><span style="font-weight:400;font-size:0.6rem;">can't connect</span></div>
+            </div>
+            <div class="dog-message error">Couldn't load stock right now.</div>
+            <div style="font-size:0.8rem;color:#A07860;margin-top:0.25rem;">${e.message}</div>
+            <button onclick="location.reload()" style="margin-top:1.5rem;padding:0.65rem 1.5rem;background:#4AABAB;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.9rem;">Try Again</button>
+          </div>`;
+      }
+    }
+
+    // ============================================================
+    // RENDER PAGE
+    // ============================================================
+    function renderPage() {
+      const main = document.getElementById('retailer-main');
+      main.innerHTML = `
+        <!-- Toolbar -->
+        <div class="retailer-toolbar">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="search-input" placeholder="Search designs...">
+          </div>
+          <div class="view-toggle">
+            <button class="view-toggle-btn ${isGridView ? 'active' : ''}" id="grid-btn" title="Grid">⊞</button>
+            <button class="view-toggle-btn ${!isGridView ? 'active' : ''}" id="list-btn" title="List">☰</button>
+          </div>
+        </div>
+
+        <!-- Tag filters -->
+        <div class="tag-filter-wrap" id="tag-filter-bar"></div>
+
+        <!-- Items -->
+        <div id="items-container"></div>
+
+        <!-- Request Section -->
+        <div class="request-section" id="request-section">
+          <div class="request-section-title">📋 Your Request</div>
+          <div class="request-section-sub">Cards you've selected will appear here. You can adjust quantities or remove items before submitting.</div>
+
+          <div id="cart-container"></div>
+
+          <hr class="form-divider">
+
+          <!-- Retailer info -->
+          <div class="form-section-label">Your Store Info</div>
+
+          <div class="form-field">
+            <label class="field-label">Store / Account Name *</label>
+            <div class="retailer-search-wrap">
+              <div id="retailer-selected-display" style="display:none;"></div>
+              <input type="text" class="field-input" id="retailer-search-input"
+                placeholder="Start typing your store name..."
+                autocomplete="off">
+              <div class="retailer-dropdown" id="retailer-dropdown"></div>
+            </div>
+            <div class="field-hint">Type at least 2 characters to search. Only registered partners can submit requests.</div>
+          </div>
+
+          <div id="submitter-fields" style="display:none;">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Your Name *</label>
+                <input type="text" class="field-input" id="submitter-name" placeholder="Your full name">
+              </div>
+              <div class="form-field">
+                <label class="field-label">Your Email *</label>
+                <input type="email" class="field-input" id="submitter-email" placeholder="your@email.com">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">Notes (optional)</label>
+              <input type="text" class="field-input" id="order-notes" placeholder="Any special notes for this request...">
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" id="review-btn" disabled onclick="openReviewModal()">
+            Review Request →
+          </button>
+          <div id="submit-status" class="form-status"></div>
+        </div>
+      `;
+
+      renderTagFilterBar();
+      renderItems();
+      renderCart();
+      setupToolbar();
+      setupRetailerSearch();
+    }
+
+    // ============================================================
+    // TAG FILTER BAR
+    // ============================================================
+    function renderTagFilterBar() {
+      const bar = document.getElementById('tag-filter-bar');
+      if (!bar || allTags.length === 0) return;
+
+      const categories = {};
+      allTags.forEach(tag => {
+        if (!categories[tag.Category]) categories[tag.Category] = [];
+        categories[tag.Category].push(tag);
+      });
+
+      bar.innerHTML = `
+        <button class="tag-chip ${!activeTagFilter ? 'active' : ''}" onclick="setTagFilter(null)">All</button>
+        ${Object.entries(categories).map(([cat, tags]) =>
+          tags.map(tag => `
+            <button class="tag-chip ${activeTagFilter === tag.TagID ? 'active' : ''}"
+              onclick="setTagFilter('${tag.TagID}')">
+              ${tag.TagName}
+            </button>`).join('')
+        ).join('')}`;
+    }
+
+    function setTagFilter(tagId) {
+      activeTagFilter = tagId;
+      filteredItems = tagId ? allItems : [...allItems]; // tag filtering by itemTagsMap would go here
+      renderTagFilterBar();
+      renderItems();
+    }
+
+    // ============================================================
+    // TOOLBAR SETUP
+    // ============================================================
+    function setupToolbar() {
+      document.getElementById('search-input')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        filteredItems = allItems.filter(item =>
+          item.displayName.toLowerCase().includes(q) ||
+          String(item.itemId).includes(q)
+        );
+        renderItems();
+      });
+
+      document.getElementById('grid-btn')?.addEventListener('click', () => {
+        isGridView = true;
+        document.getElementById('grid-btn').classList.add('active');
+        document.getElementById('list-btn').classList.remove('active');
+        renderItems();
+      });
+
+      document.getElementById('list-btn')?.addEventListener('click', () => {
+        isGridView = false;
+        document.getElementById('list-btn').classList.add('active');
+        document.getElementById('grid-btn').classList.remove('active');
+        renderItems();
+      });
+    }
+
+    // ============================================================
+    // RENDER ITEMS
+    // ============================================================
+    function renderItems() {
+      const container = document.getElementById('items-container');
+      if (!container) return;
+
+      if (filteredItems.length === 0) {
+        container.innerHTML = `
+          <div class="dog-state">
+            <div class="dog-png-wrap">
+              <img src="doggycutetonguev2.png" class="dog-png" alt="Nothing found">
+              <div class="dog-badge dog-badge-empty">
+                <svg width="32" height="32" viewBox="0 0 38 38" fill="none">
+                  <circle cx="16" cy="16" r="11" stroke="#4AABAB" stroke-width="3.5" fill="rgba(74,171,171,0.1)"/>
+                  <line x1="24" y1="24" x2="34" y2="34" stroke="#4AABAB" stroke-width="3.5" stroke-linecap="round"/>
+                  <text x="10" y="21" font-size="11" fill="#4AABAB" font-weight="bold">?</text>
+                </svg>
+              </div>
+            </div>
+            <div class="dog-message">No designs found.</div>
+          </div>`;
+        return;
+      }
+
+      if (isGridView) {
+        container.innerHTML = `<div class="items-grid">${filteredItems.map(item => renderItemCard(item)).join('')}</div>`;
+      } else {
+        container.innerHTML = `<div class="items-list-view">${filteredItems.map(item => renderItemListRow(item)).join('')}</div>`;
+      }
+    }
+
+    function renderItemCard(item) {
+      const cartItem = cart[item.itemId];
+      const currentQty = cartItem ? cartItem.qty : 0;
+      const allPending = item.available === 0 && item.pending > 0;
+
+      return `
+        <div class="item-card ${allPending ? 'all-pending' : ''}" id="card-${item.itemId}">
+          ${allPending ? `<div class="pending-banner">⏳ All Pending</div>` : ''}
+          <div class="item-card-image" onclick="openLightbox('${item.itemId}')">
+            ${item.photo
+              ? `<img src="${item.photo}" alt="${item.displayName}" loading="lazy">`
+              : `<span class="item-card-placeholder">🖼</span>`}
+            <div class="item-card-image-overlay"><span class="zoom-icon">🔍</span></div>
+          </div>
+          <div class="item-card-body">
+            <div class="item-card-id">#${item.itemId}</div>
+            <div class="item-card-name">${item.displayName}</div>
+            <div class="item-card-stock-row">
+              <span class="stock-available">${item.available} available</span>
+              ${item.pending > 0 ? `<span class="stock-pending">${item.pending} pending</span>` : ''}
+            </div>
+            ${!allPending ? `
+              <div class="card-qty-row">
+                <button class="qty-btn" onclick="changeQty('${item.itemId}', -1)" ${currentQty <= 0 ? 'disabled' : ''}>−</button>
+                <input type="number" class="qty-input" id="qty-${item.itemId}"
+                  value="${currentQty}" min="0" max="${item.available}"
+                  onchange="setQty('${item.itemId}', this.value)">
+                <button class="qty-btn" onclick="changeQty('${item.itemId}', 1)" ${currentQty >= item.available ? 'disabled' : ''}>+</button>
+                <button class="add-to-request-btn ${currentQty > 0 ? 'added' : ''}"
+                  onclick="addToCart('${item.itemId}')">
+                  ${currentQty > 0 ? '✓ Added' : '+ Add'}
+                </button>
+              </div>` : `<div style="font-size:0.75rem;color:#E8933A;text-align:center;padding:0.4rem 0;">All units currently pending</div>`}
+          </div>
+        </div>`;
+    }
+
+    function renderItemListRow(item) {
+      const cartItem = cart[item.itemId];
+      const currentQty = cartItem ? cartItem.qty : 0;
+      const allPending = item.available === 0 && item.pending > 0;
+
+      return `
+        <div class="list-item-row" id="list-${item.itemId}">
+          <div class="list-item-thumb" onclick="openLightbox('${item.itemId}')">
+            ${item.photo
+              ? `<img src="${item.photo}" alt="${item.displayName}" loading="lazy">`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">🖼</div>`}
+          </div>
+          <div class="list-item-info">
+            <div class="list-item-id">#${item.itemId}</div>
+            <div class="list-item-name">${item.displayName}</div>
+            <div class="list-item-type">${item.productType || ''}</div>
+          </div>
+          <div class="list-item-stock">
+            <div class="list-item-available">${item.available}</div>
+            <div class="list-item-available-label">Available</div>
+            ${item.pending > 0 ? `<div class="list-item-pending">${item.pending} pending</div>` : ''}
+          </div>
+          <div class="list-item-actions">
+            ${!allPending ? `
+              <button class="qty-btn" onclick="changeQty('${item.itemId}', -1)" ${currentQty <= 0 ? 'disabled' : ''}>−</button>
+              <input type="number" class="qty-input" id="qty-${item.itemId}"
+                value="${currentQty}" min="0" max="${item.available}"
+                onchange="setQty('${item.itemId}', this.value)">
+              <button class="qty-btn" onclick="changeQty('${item.itemId}', 1)" ${currentQty >= item.available ? 'disabled' : ''}>+</button>
+              <button class="add-to-request-btn ${currentQty > 0 ? 'added' : ''}"
+                onclick="addToCart('${item.itemId}')">
+                ${currentQty > 0 ? '✓' : '+'}
+              </button>` : `<span style="font-size:0.75rem;color:#E8933A;">All pending</span>`}
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // CART FUNCTIONS
+    // ============================================================
+    function changeQty(itemId, delta) {
+      const item = allItems.find(i => String(i.itemId) === String(itemId));
+      if (!item) return;
+      const input = document.getElementById(`qty-${itemId}`);
+      if (!input) return;
+      const current = parseInt(input.value) || 0;
+      const newVal = Math.max(0, Math.min(item.available, current + delta));
+      input.value = newVal;
+      if (cart[itemId] && newVal > 0) {
+        cart[itemId].qty = newVal;
+        renderCart();
+      } else if (newVal === 0 && cart[itemId]) {
+        delete cart[itemId];
+        renderCart();
+      }
+      renderItems(); // Refresh button states
+    }
+
+    function setQty(itemId, val) {
+      const item = allItems.find(i => String(i.itemId) === String(itemId));
+      if (!item) return;
+      const qty = Math.max(0, Math.min(item.available, parseInt(val) || 0));
+      if (cart[itemId] && qty > 0) {
+        cart[itemId].qty = qty;
+        renderCart();
+      } else if (qty === 0 && cart[itemId]) {
+        delete cart[itemId];
+        renderCart();
+      }
+    }
+
+    function addToCart(itemId) {
+      const item = allItems.find(i => String(i.itemId) === String(itemId));
+      if (!item) return;
+      const input = document.getElementById(`qty-${itemId}`);
+      const qty = input ? (parseInt(input.value) || 1) : 1;
+      if (qty <= 0 || qty > item.available) {
+        showToast('Please enter a valid quantity', 'error-toast');
+        return;
+      }
+      cart[itemId] = { item, qty };
+      renderCart();
+      renderItems();
+      showToast(`✓ #${itemId} added to request`, 'success');
+
+      // Scroll to request section smoothly
+      document.getElementById('request-section')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function removeFromCart(itemId) {
+      delete cart[itemId];
+      renderCart();
+      renderItems();
+    }
+
+    function updateCartQty(itemId, val) {
+      const item = allItems.find(i => String(i.itemId) === String(itemId));
+      if (!item) return;
+      const qty = Math.max(1, Math.min(item.available, parseInt(val) || 1));
+      if (cart[itemId]) {
+        cart[itemId].qty = qty;
+        renderCart();
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-container');
+      if (!container) return;
+
+      const cartItems = Object.values(cart);
+      const reviewBtn = document.getElementById('review-btn');
+
+      if (cartItems.length === 0) {
+        container.innerHTML = `<div class="cart-empty">No cards selected yet — browse above and add items to your request.</div>`;
+        if (reviewBtn) reviewBtn.disabled = true;
+        return;
+      }
+
+      const isWholesale = selectedRetailer?.partnerType === 'wholesale';
+      let subTotal = 0;
+
+      const rows = cartItems.map(({ item, qty }) => {
+        const lineTotal = isWholesale ? (item.wholesalePrice || 2) * qty : 0;
+        subTotal += lineTotal;
+        return `
+          <tr>
+            <td><span class="cart-item-id">#${item.itemId}</span></td>
+            <td><span class="cart-item-name">${item.displayName}</span></td>
+            <td>
+              <input type="number" class="cart-qty-input" value="${qty}" min="1" max="${item.available}"
+                onchange="updateCartQty('${item.itemId}', this.value)">
+            </td>
+            ${isWholesale ? `<td class="cart-line-price">$${lineTotal.toFixed(2)}</td>` : ''}
+            <td><button class="cart-remove-btn" onclick="removeFromCart('${item.itemId}')" title="Remove">✕</button></td>
+          </tr>`;
+      }).join('');
+
+      const tax = isWholesale ? subTotal * VA_SALES_TAX : 0;
+      const estTotal = subTotal + tax;
+
+      container.innerHTML = `
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Design</th>
+              <th>Qty</th>
+              ${isWholesale ? '<th>Total</th>' : ''}
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${isWholesale ? `
+          <div class="cart-totals">
+            <div class="cart-totals-row"><span>Subtotal</span><span>$${subTotal.toFixed(2)}</span></div>
+            <div class="cart-totals-row"><span>VA Sales Tax (5.3%)</span><span>$${tax.toFixed(2)}</span></div>
+            <div class="cart-totals-row total"><span>Estimated Total</span><span>$${estTotal.toFixed(2)}</span></div>
+            <div class="cart-estimate-note">*This is an estimate only. Final invoice reflects actual fulfilled quantities.</div>
+          </div>` : ''}`;
+
+      // Enable review button if cart has items and retailer selected
+      if (reviewBtn) {
+        reviewBtn.disabled = cartItems.length === 0 || !selectedRetailer;
+      }
+
+      checkReviewBtn();
+    }
+
+    function checkReviewBtn() {
+      const btn = document.getElementById('review-btn');
+      if (!btn) return;
+      const hasItems = Object.keys(cart).length > 0;
+      const hasRetailer = !!selectedRetailer;
+      const hasName = (document.getElementById('submitter-name')?.value || '').trim().length > 0;
+      const hasEmail = (document.getElementById('submitter-email')?.value || '').trim().length > 0;
+      btn.disabled = !(hasItems && hasRetailer && hasName && hasEmail);
+    }
+
+    // ============================================================
+    // RETAILER SEARCH (typeahead)
+    // ============================================================
+    function setupRetailerSearch() {
+      const input = document.getElementById('retailer-search-input');
+      const dropdown = document.getElementById('retailer-dropdown');
+      if (!input || !dropdown) return;
+
+      let debounce;
+      input.addEventListener('input', () => {
+        clearTimeout(debounce);
+        const q = input.value.trim();
+        if (q.length < 2) { dropdown.classList.remove('open'); return; }
+        debounce = setTimeout(() => searchRetailers(q), 300);
+      });
+
+      input.addEventListener('blur', () => {
+        setTimeout(() => dropdown.classList.remove('open'), 200);
+      });
+
+      // Watch submitter fields for review button state
+      ['submitter-name', 'submitter-email'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', checkReviewBtn);
+      });
+    }
+
+    async function searchRetailers(query) {
+      const dropdown = document.getElementById('retailer-dropdown');
+      if (!dropdown) return;
+
+      try {
+        const r = await fetch(`${SCRIPT_URL}?action=searchRetailers&query=${encodeURIComponent(query)}`);
+        const data = await r.json();
+        const partners = data.partners || [];
+
+        let html = partners.map(p => `
+          <div class="retailer-option" onclick="selectRetailer(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+            <strong>${p.label}</strong>${p.city ? ` <span style="color:#A07860;font-size:0.8rem">— ${p.city}</span>` : ''}
+          </div>`).join('');
+
+        html += `<div class="retailer-option not-found" onclick="openNewPartnerModal()">
+          🤔 Not listed? Request a partner account →
+        </div>`;
+
+        dropdown.innerHTML = html;
+        dropdown.classList.add('open');
+      } catch (e) {
+        dropdown.innerHTML = `<div class="retailer-option not-found">Error searching — try again</div>`;
+        dropdown.classList.add('open');
+      }
+    }
+
+    function selectRetailer(partner) {
+      selectedRetailer = partner;
+      const display = document.getElementById('retailer-selected-display');
+      const input = document.getElementById('retailer-search-input');
+      const dropdown = document.getElementById('retailer-dropdown');
+      const submitterFields = document.getElementById('submitter-fields');
+
+      if (display) {
+        display.style.display = 'flex';
+        display.innerHTML = `
+          <div class="selected-retailer-badge">
+            <span>✓ ${partner.label}${partner.city ? ` — ${partner.city}` : ''}</span>
+            <button class="selected-retailer-change" onclick="clearRetailer()">Change</button>
+          </div>`;
+      }
+
+      if (input) input.style.display = 'none';
+      if (dropdown) dropdown.classList.remove('open');
+      if (submitterFields) submitterFields.style.display = 'block';
+
+      // Re-render cart to show pricing if wholesale
+      renderCart();
+      checkReviewBtn();
+    }
+
+    function clearRetailer() {
+      selectedRetailer = null;
+      const display = document.getElementById('retailer-selected-display');
+      const input = document.getElementById('retailer-search-input');
+      const submitterFields = document.getElementById('submitter-fields');
+
+      if (display) display.style.display = 'none';
+      if (input) { input.style.display = 'block'; input.value = ''; input.focus(); }
+      if (submitterFields) submitterFields.style.display = 'none';
+
+      renderCart();
+      checkReviewBtn();
+    }
+
+    // ============================================================
+    // REVIEW MODAL
+    // ============================================================
+    function openReviewModal() {
+      const cartItems = Object.values(cart);
+      if (cartItems.length === 0 || !selectedRetailer) return;
+
+      const isWholesale = selectedRetailer.partnerType === 'wholesale';
+      let subTotal = 0;
+
+      const rows = cartItems.map(({ item, qty }) => {
+        const lineTotal = isWholesale ? (item.wholesalePrice || 2) * qty : 0;
+        subTotal += lineTotal;
+        return `
+          <tr>
+            <td>#${item.itemId}</td>
+            <td>${item.displayName}</td>
+            <td style="text-align:center;">${qty}</td>
+            ${isWholesale ? `<td style="text-align:right;">$${lineTotal.toFixed(2)}</td>` : ''}
+          </tr>`;
+      }).join('');
+
+      const tax = isWholesale ? subTotal * VA_SALES_TAX : 0;
+      const estTotal = subTotal + tax;
+      const submitterName = document.getElementById('submitter-name')?.value || '';
+      const submitterEmail = document.getElementById('submitter-email')?.value || '';
+      const notes = document.getElementById('order-notes')?.value || '';
+
+      openModal(`
+        <div class="review-header">
+          <div>
+            <div class="review-header-title">✦ Prints by Angel</div>
+            <div class="review-header-sub">${isWholesale ? 'Wholesale Order' : 'Consignment Restock Request'} — Review</div>
+          </div>
+          <span class="badge badge-${isWholesale ? 'teal' : 'amber'}">${isWholesale ? 'Wholesale' : 'Consignment'}</span>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <div style="font-size:0.75rem;color:#A07860;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.2rem;">Partner</div>
+          <div style="font-weight:600;color:#3D2B1F;">${selectedRetailer.label}${selectedRetailer.city ? ` — ${selectedRetailer.city}` : ''}</div>
+          <div style="font-size:0.82rem;color:#6B4C3B;margin-top:0.15rem;">Submitted by: ${submitterName} (${submitterEmail})</div>
+        </div>
+
+        <table class="review-items-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Design</th>
+              <th style="text-align:center">Qty</th>
+              ${isWholesale ? '<th style="text-align:right">Total</th>' : ''}
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        ${isWholesale ? `
+          <div class="review-totals">
+            <div class="review-total-row"><span>Subtotal</span><span>$${subTotal.toFixed(2)}</span></div>
+            <div class="review-total-row"><span>VA Sales Tax (5.3%)</span><span>$${tax.toFixed(2)}</span></div>
+            <div class="review-total-row grand"><span>Estimated Total</span><span>$${estTotal.toFixed(2)}</span></div>
+            <div class="review-estimate-note">*Estimate only. Final invoice reflects actual fulfilled quantities.</div>
+          </div>` : `
+          <div class="consignment-note">
+            📦 This is a consignment restock request — no payment is due at this time. Angel will review and fulfill your request.
+          </div>`}
+
+        ${notes ? `<div style="font-size:0.82rem;color:#6B4C3B;background:#F5F0E4;padding:0.75rem;border-radius:6px;margin-bottom:1rem;">📝 ${notes}</div>` : ''}
+
+        <p style="font-size:0.82rem;color:#A07860;margin-bottom:1rem;">
+          Looks good? Click <strong>Submit Request</strong> to proceed. You'll be asked to verify your identity before it goes through.
+        </p>
+
+        <button class="btn btn-primary btn-lg" onclick="openVerifyModal(${JSON.stringify({submitterName,submitterEmail,notes,subTotal,tax,estTotal,isWholesale}).replace(/"/g,'&quot;')})">
+          Submit Request →
+        </button>`);
+    }
+
+    // ============================================================
+    // VERIFY MODAL
+    // ============================================================
+    function openVerifyModal(reviewData) {
+      openModal(`
+        <div class="verify-icon">🔐</div>
+        <div class="modal-title" style="text-align:center;">One Last Step</div>
+        <div class="modal-sub" style="text-align:center;">
+          To protect against unauthorized requests, please enter the <strong>personal email or cell phone number</strong> of the owner or manager who set up this account.
+          <br><br>
+          <span style="font-size:0.8rem;color:#A07860;">This should be their personal info — not the store's main phone or public email.</span>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Owner / Manager Email</label>
+          <input type="email" class="field-input" id="verify-email" placeholder="Their personal email address">
+        </div>
+        <div style="text-align:center;font-size:0.8rem;color:#A07860;margin:-0.5rem 0 0.75rem;">— or —</div>
+        <div class="form-field">
+          <label class="field-label">Owner / Manager Cell Phone</label>
+          <input type="tel" class="field-input" id="verify-phone" placeholder="Their personal cell number">
+        </div>
+
+        <div class="verify-error" id="verify-error">
+          ❌ That info doesn't match what we have on file. Please use the personal email or cell of the manager or owner who originally set up this account — not a store email or public number.
+        </div>
+
+        <button class="btn btn-primary btn-lg" style="margin-top:1rem" onclick="submitVerify()">
+          Confirm & Submit
+        </button>
+        <div id="verify-status" class="form-status"></div>`);
+
+      // Store reviewData for use in submitVerify
+      window._pendingReviewData = reviewData;
+    }
+
+    async function submitVerify() {
+      const email = document.getElementById('verify-email')?.value.trim();
+      const phone = document.getElementById('verify-phone')?.value.trim();
+      const errorEl = document.getElementById('verify-error');
+      const status = document.getElementById('verify-status');
+
+      if (!email && !phone) {
+        if (errorEl) { errorEl.textContent = '⚠️ Please enter either an email or phone number.'; errorEl.classList.add('show'); }
+        return;
+      }
+
+      status.className = 'form-status loading';
+      status.textContent = 'Verifying...';
+      if (errorEl) errorEl.classList.remove('show');
+
+      try {
+        const r = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'verifyRetailer',
+            locationId: selectedRetailer.value,
+            email: email || '',
+            phone: phone || '',
+          })
+        });
+        const result = await r.json();
+
+        if (!result.success) throw new Error(result.error || 'Verification failed');
+
+        if (!result.verified) {
+          status.className = 'form-status';
+          if (errorEl) errorEl.classList.add('show');
+          return;
+        }
+
+        // Verified! Submit order
+        status.textContent = 'Submitting order...';
+        await submitOrder();
+
+      } catch (e) {
+        status.className = 'form-status error';
+        status.textContent = '❌ ' + e.message;
+      }
+    }
+
+    // ============================================================
+    // SUBMIT ORDER
+    // ============================================================
+    async function submitOrder() {
+      const status = document.getElementById('verify-status');
+      const cartItems = Object.values(cart);
+      const submitterName = document.getElementById('submitter-name')?.value || '';
+      const submitterEmail = document.getElementById('submitter-email')?.value || '';
+      const notes = document.getElementById('order-notes')?.value || '';
+
+      const orderData = {
+        action: 'submitOrder',
+        orderData: {
+          locationId: selectedRetailer.value,
+          partnerName: selectedRetailer.label,
+          partnerType: selectedRetailer.partnerType || 'consignment',
+          submitterName,
+          submitterEmail,
+          notes,
+          items: cartItems.map(({ item, qty }) => ({
+            itemId: item.itemId,
+            designName: item.displayName,
+            qty,
+            wholesalePrice: item.wholesalePrice || 2,
+          }))
+        }
+      };
+
+      try {
+        const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(orderData) });
+        const result = await r.json();
+
+        if (!result.success) throw new Error(result.error || 'Submission failed');
+
+        // Show success screen
+        openModal(`
+          <div class="success-screen">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Request Submitted!</div>
+            <div class="success-sub">
+              Thanks ${submitterName}! We've received your request for <strong>${selectedRetailer.label}</strong>
+              and sent a confirmation to <strong>${submitterEmail}</strong>.
+              <br><br>
+              We'll review everything and be in touch soon!
+            </div>
+            <div style="margin-top:1.5rem;font-size:0.75rem;color:#A07860;">Order ID: ${result.orderId}</div>
+          </div>`);
+
+        // Clear cart
+        cart = {};
+        selectedRetailer = null;
+
+      } catch (e) {
+        if (status) {
+          status.className = 'form-status error';
+          status.textContent = '❌ ' + e.message;
+        }
+      }
+    }
+
+    // ============================================================
+    // NEW PARTNER REQUEST MODAL
+    // ============================================================
+    function openNewPartnerModal() {
+      let selectedType = null;
+
+      openModal(`
+        <div class="modal-title">Request a Partner Account</div>
+        <div class="modal-sub">Interested in carrying Prints by Angel cards? Fill out the form below and we'll be in touch!</div>
+
+        <div class="partner-request-type-row">
+          <div class="type-option" id="type-consignment" onclick="selectPartnerType('consignment')">
+            <div class="type-option-icon">🤝</div>
+            <div class="type-option-label">Consignment</div>
+            <div class="type-option-desc">We stock, you sell, we split</div>
+          </div>
+          <div class="type-option" id="type-wholesale" onclick="selectPartnerType('wholesale')">
+            <div class="type-option-icon">📦</div>
+            <div class="type-option-label">Wholesale</div>
+            <div class="type-option-desc">Buy inventory upfront</div>
+          </div>
+        </div>
+
+        <div id="consignment-region-field" style="display:none;">
+          <div class="form-field">
+            <label class="field-label">Your Region *</label>
+            <select class="field-input" id="partner-region" onchange="checkRegion()">
+              <option value="">Select your area...</option>
+              ${CONSIGNMENT_REGIONS.map(r => `<option value="${r}">${r}</option>`).join('')}
+              <option value="other">Other / Not listed</option>
+            </select>
+            <div class="region-note">⚠️ Consignment partnerships are only available in select areas of Virginia.</div>
+            <div class="not-in-region-note" id="not-in-region-note">
+              Your area isn't currently covered for consignment. Please select <strong>Wholesale</strong> above, or check back later as we expand!
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Your Name *</label>
+          <input type="text" class="field-input" id="req-person-name" placeholder="Your full name">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Store Name *</label>
+          <input type="text" class="field-input" id="req-store-name" placeholder="Your store or business name">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Address / Location *</label>
+          <input type="text" class="field-input" id="req-address" placeholder="City, State or full address">
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="field-label">Email *</label>
+            <input type="email" class="field-input" id="req-email" placeholder="your@email.com">
+          </div>
+          <div class="form-field">
+            <label class="field-label">Phone</label>
+            <input type="tel" class="field-input" id="req-phone" placeholder="(555) 000-0000">
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="submitPartnerRequest()">Submit Request</button>
+        <div id="partner-req-status" class="form-status"></div>`);
+    }
+
+    function selectPartnerType(type) {
+      document.getElementById('type-consignment')?.classList.toggle('selected', type === 'consignment');
+      document.getElementById('type-wholesale')?.classList.toggle('selected', type === 'wholesale');
+      document.getElementById('consignment-region-field').style.display = type === 'consignment' ? 'block' : 'none';
+      window._selectedPartnerType = type;
+    }
+
+    function checkRegion() {
+      const val = document.getElementById('partner-region')?.value;
+      const note = document.getElementById('not-in-region-note');
+      if (note) note.style.display = val === 'other' ? 'block' : 'none';
+    }
+
+    async function submitPartnerRequest() {
+      const status = document.getElementById('partner-req-status');
+      const personName = document.getElementById('req-person-name')?.value.trim();
+      const storeName = document.getElementById('req-store-name')?.value.trim();
+      const address = document.getElementById('req-address')?.value.trim();
+      const email = document.getElementById('req-email')?.value.trim();
+      const phone = document.getElementById('req-phone')?.value.trim();
+      const accountType = window._selectedPartnerType || '';
+      const region = document.getElementById('partner-region')?.value || '';
+
+      if (!personName || !storeName || !address || !email || !accountType) {
+        status.className = 'form-status error';
+        status.textContent = '⚠️ Please fill in all required fields and select an account type.';
+        return;
+      }
+
+      if (accountType === 'consignment' && region === 'other') {
+        status.className = 'form-status error';
+        status.textContent = '⚠️ Consignment is not available in your area. Please select Wholesale.';
+        return;
+      }
+
+      status.className = 'form-status loading';
+      status.textContent = 'Submitting request...';
+
+      try {
+        const r = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'submitPartnerRequest',
+            requestData: { personName, storeName, address, accountType, region, email, phone }
+          })
+        });
+        const result = await r.json();
+        if (!result.success) throw new Error(result.error);
+
+        openModal(`
+          <div class="success-screen">
+            <div class="success-icon">🙌</div>
+            <div class="success-title">Request Received!</div>
+            <div class="success-sub">
+              Thanks ${personName}! We've received your request for <strong>${storeName}</strong> and will be in touch soon at ${email}.
+            </div>
+          </div>`);
+
+      } catch (e) {
+        status.className = 'form-status error';
+        status.textContent = '❌ ' + e.message;
+      }
+    }
+
+    // ============================================================
+    // LIGHTBOX
+    // ============================================================
+    function setupLightbox() {
+      const overlay = document.getElementById('lightbox-overlay');
+      overlay?.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.id === 'lightbox-overlay') closeLightbox();
+      });
+    }
+
+    function openLightbox(itemId) {
+      const item = allItems.find(i => String(i.itemId) === String(itemId));
+      if (!item) return;
+
+      const imageEl = document.getElementById('lightbox-image');
+      const bodyEl = document.getElementById('lightbox-body');
+
+      imageEl.innerHTML = item.photo
+        ? `<img src="${item.photo}" alt="${item.displayName}">`
+        : `<div class="lightbox-image-placeholder">🖼</div>`;
+
+      bodyEl.innerHTML = `
+        <div class="lightbox-id">#${item.itemId}</div>
+        <div class="lightbox-name">${item.displayName}</div>
+        <div class="lightbox-stats">
+          <div class="lightbox-stat">
+            <div class="lightbox-stat-label">Available</div>
+            <div class="lightbox-stat-value" style="color:#5A9E6F">${item.available}</div>
+          </div>
+          <div class="lightbox-stat">
+            <div class="lightbox-stat-label">Type</div>
+            <div class="lightbox-stat-value" style="font-size:0.9rem">${item.productType || '—'}</div>
+          </div>
+          ${item.pending > 0 ? `
+            <div class="lightbox-stat">
+              <div class="lightbox-stat-label">Pending</div>
+              <div class="lightbox-stat-value" style="color:#E8933A;font-size:1rem">${item.pending}</div>
+            </div>` : ''}
+          <div class="lightbox-stat">
+            <div class="lightbox-stat-label">Retail Price</div>
+            <div class="lightbox-stat-value" style="font-size:1rem">$${Number(item.unitPrice || 0).toFixed(2)}</div>
+          </div>
+        </div>
+        <div class="lightbox-close-hint">Click anywhere outside to close</div>`;
+
+      document.getElementById('lightbox-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ============================================================
+    // MODAL
+    // ============================================================
+    function setupModal() {
+      document.getElementById('modal-close')?.addEventListener('click', closeModal);
+      document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('modal-overlay')) closeModal();
+      });
+    }
+
+    function openModal(html) {
+      document.getElementById('modal-content').innerHTML = html;
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast show ${type}`;
+      setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+  </script>
+
+  <footer class="retailer-footer">
+    ✦ Prints by Angel · Handmade Letterpress Cards · All rights reserved
+  </footer>
+
+</body>
+</html>
