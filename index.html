@@ -1062,7 +1062,7 @@
     let cart = {}; // { itemId: { item, qty } }
     let selectedRetailer = null; // { value, label, city, partnerType, ... }
     let isGridView = true;
-    let activeTagFilter = null;
+    let activeTagFilters = new Set();
     let allTags = [];
 
     // ============================================================
@@ -1195,20 +1195,33 @@
       });
 
       bar.innerHTML = `
-        <button class="tag-chip ${!activeTagFilter ? 'active' : ''}" onclick="setTagFilter(null)">All</button>
+        ${activeTagFilters.size > 0 ? `<button class="tag-chip" style="background:var(--coral-light,#fde8e0);border-color:var(--coral,#e07050);color:var(--coral-dark,#b84530);" onclick="clearTagFilters()">✕ Clear</button>` : ''}
         ${Object.entries(categories).map(([cat, tags]) =>
           tags.map(tag => `
-            <button class="tag-chip ${activeTagFilter === tag.TagID ? 'active' : ''}"
-              onclick="setTagFilter('${tag.TagID}')">
+            <button class="tag-chip ${activeTagFilters.has(tag.TagID) ? 'active' : ''}"
+              onclick="toggleTagFilter('${tag.TagID}')">
               ${tag.TagName}
             </button>`).join('')
         ).join('')}`;
     }
 
-    function setTagFilter(tagId) {
-      activeTagFilter = tagId;
-      filteredItems = tagId
-        ? allItems.filter(item => (item.tags || []).includes(tagId))
+    function toggleTagFilter(tagId) {
+      if (activeTagFilters.has(tagId)) activeTagFilters.delete(tagId);
+      else activeTagFilters.add(tagId);
+      applyTagFilters();
+    }
+
+    function clearTagFilters() {
+      activeTagFilters.clear();
+      applyTagFilters();
+    }
+
+    function applyTagFilters() {
+      filteredItems = activeTagFilters.size > 0
+        ? allItems.filter(item => {
+            const itemTags = item.tags || [];
+            return [...activeTagFilters].every(t => itemTags.includes(t));
+          })
         : [...allItems];
       renderTagFilterBar();
       renderItems();
@@ -1220,8 +1233,8 @@
     function setupToolbar() {
       document.getElementById('search-input')?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase();
-        let base = activeTagFilter
-          ? allItems.filter(item => (item.tags || []).includes(activeTagFilter))
+        let base = activeTagFilters.size > 0
+          ? allItems.filter(item => [...activeTagFilters].every(t => (item.tags || []).includes(t)))
           : allItems;
         filteredItems = q
           ? base.filter(item => item.displayName.toLowerCase().includes(q) || String(item.itemId).includes(q))
@@ -2024,15 +2037,15 @@
       const app = document.getElementById('retailer-main');
       if (!app) return;
       app.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:2rem;">
-          <div class="dog-png-wrap" style="width:180px;height:180px;">
-            <img src="doggycutetonguev2.png" class="dog-png" alt="Thank you!" style="width:170px;height:170px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:85vh;text-align:center;padding:2.5rem;">
+          <div class="dog-png-wrap" style="width:240px;height:240px;">
+            <img src="doggycutetonguev2.png" class="dog-png" alt="Thank you!" style="width:230px;height:230px;">
           </div>
-          <h2 style="color:#5B4A3F;margin:1rem 0 0.5rem;font-size:1.5rem;">Thank You!</h2>
-          <p style="color:#A07860;font-size:1rem;max-width:360px;line-height:1.6;">
+          <h2 style="color:#5B4A3F;margin:1.25rem 0 0.75rem;font-size:2rem;">Thank You!</h2>
+          <p style="color:#A07860;font-size:1.2rem;max-width:420px;line-height:1.7;">
             Your restock request has been sent to Angel. You can safely close this browser window now.
           </p>
-          <p style="color:#C4A882;font-size:0.8rem;margin-top:1.5rem;">— Prints by Angel —</p>
+          <p style="color:#C4A882;font-size:1rem;margin-top:2rem;">— Prints by Angel —</p>
         </div>`;
     }
 
