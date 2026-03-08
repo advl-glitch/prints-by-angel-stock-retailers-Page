@@ -1683,9 +1683,11 @@
           ❌ That info doesn't match what we have on file. Please use the personal email or cell of the manager or owner who originally set up this account — not a store email or public number.
         </div>
 
-        <button class="btn btn-primary btn-lg" style="margin-top:1rem" onclick="submitVerify()">
-          Confirm & Submit
-        </button>
+        <div id="verify-btn-wrap">
+          <button class="btn btn-primary btn-lg" style="margin-top:1rem" onclick="submitVerify()">
+            Confirm & Submit
+          </button>
+        </div>
         <div id="verify-status" class="form-status"></div>`);
 
       // Store reviewData for use in submitVerify
@@ -1703,8 +1705,12 @@
         return;
       }
 
+      // Hide button, show status in its place
+      const btnWrap = document.getElementById('verify-btn-wrap');
+      if (btnWrap) btnWrap.style.display = 'none';
       status.className = 'form-status loading';
       status.textContent = 'Verifying...';
+      status.style.display = 'block';
       if (errorEl) errorEl.classList.remove('show');
 
       try {
@@ -1723,6 +1729,8 @@
 
         if (!result.verified) {
           status.className = 'form-status';
+          status.style.display = 'none';
+          if (btnWrap) btnWrap.style.display = '';
           if (errorEl) errorEl.classList.add('show');
           return;
         }
@@ -1734,6 +1742,8 @@
       } catch (e) {
         status.className = 'form-status error';
         status.textContent = '❌ ' + e.message;
+        const btnWrap = document.getElementById('verify-btn-wrap');
+        if (btnWrap) btnWrap.style.display = '';
       }
     }
 
@@ -1770,6 +1780,9 @@
         const result = await r.json();
 
         if (!result.success) throw new Error(result.error || 'Submission failed');
+
+        // Mark that order was submitted so closeModal shows thank you
+        window._orderJustSubmitted = true;
 
         // Show success screen
         openModal(`
@@ -1999,6 +2012,28 @@
     function closeModal() {
       document.getElementById('modal-overlay').classList.remove('open');
       document.body.style.overflow = '';
+
+      // If order was just submitted, show thank you screen
+      if (window._orderJustSubmitted) {
+        window._orderJustSubmitted = false;
+        showThankYouScreen();
+      }
+    }
+
+    function showThankYouScreen() {
+      const app = document.getElementById('app');
+      if (!app) return;
+      app.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:2rem;">
+          <div class="dog-png-wrap" style="width:180px;height:180px;">
+            <img src="doggycutetonguev2.png" class="dog-png" alt="Thank you!" style="width:170px;height:170px;">
+          </div>
+          <h2 style="color:#5B4A3F;margin:1rem 0 0.5rem;font-size:1.5rem;">Thank You!</h2>
+          <p style="color:#A07860;font-size:1rem;max-width:360px;line-height:1.6;">
+            Your restock request has been sent to Angel. You can safely close this browser window now.
+          </p>
+          <p style="color:#C4A882;font-size:0.8rem;margin-top:1.5rem;">— Prints by Angel —</p>
+        </div>`;
     }
 
     // ============================================================
