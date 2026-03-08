@@ -1676,7 +1676,7 @@
         <div style="text-align:center;font-size:0.8rem;color:#A07860;margin:-0.5rem 0 0.75rem;">— or —</div>
         <div class="form-field">
           <label class="field-label">Owner / Manager Cell Phone</label>
-          <input type="tel" class="field-input" id="verify-phone" placeholder="Their personal cell number">
+          <input type="tel" class="field-input" id="verify-phone" placeholder="555-444-1111" oninput="formatPhoneInput(this)">
         </div>
 
         <div class="verify-error" id="verify-error">
@@ -1854,7 +1854,7 @@
           </div>
           <div class="form-field">
             <label class="field-label">Phone</label>
-            <input type="tel" class="field-input" id="req-phone" placeholder="(555) 000-0000">
+            <input type="tel" class="field-input" id="req-phone" placeholder="555-444-1111" oninput="formatPhoneInput(this)">
           </div>
         </div>
 
@@ -2004,6 +2004,13 @@
     // ============================================================
     // TOAST
     // ============================================================
+    function formatPhoneInput(input) {
+      const digits = input.value.replace(/\D/g, '').slice(0, 10);
+      if (digits.length <= 3) input.value = digits;
+      else if (digits.length <= 6) input.value = digits.slice(0,3) + '-' + digits.slice(3);
+      else input.value = digits.slice(0,3) + '-' + digits.slice(3,6) + '-' + digits.slice(6);
+    }
+
     function showToast(message, type = '') {
       const toast = document.getElementById('toast');
       toast.textContent = message;
