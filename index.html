@@ -1295,11 +1295,9 @@
             </div>
             ${!allPending ? `
               <div class="card-qty-row">
-                <button class="qty-btn" onclick="changeQty('${item.itemId}', -1)" ${currentQty <= 0 ? 'disabled' : ''}>−</button>
                 <input type="number" class="qty-input" id="qty-${item.itemId}"
                   value="${currentQty}" min="0" max="${item.available}"
                   onchange="setQty('${item.itemId}', this.value)">
-                <button class="qty-btn" onclick="changeQty('${item.itemId}', 1)" ${currentQty >= item.available ? 'disabled' : ''}>+</button>
                 <button class="add-to-request-btn ${currentQty > 0 ? 'added' : ''}"
                   onclick="addToCart('${item.itemId}')">
                   ${currentQty > 0 ? '✓ Added' : '+ Add'}
@@ -1333,11 +1331,9 @@
           </div>
           <div class="list-item-actions">
             ${!allPending ? `
-              <button class="qty-btn" onclick="changeQty('${item.itemId}', -1)" ${currentQty <= 0 ? 'disabled' : ''}>−</button>
               <input type="number" class="qty-input" id="qty-${item.itemId}"
                 value="${currentQty}" min="0" max="${item.available}"
                 onchange="setQty('${item.itemId}', this.value)">
-              <button class="qty-btn" onclick="changeQty('${item.itemId}', 1)" ${currentQty >= item.available ? 'disabled' : ''}>+</button>
               <button class="add-to-request-btn ${currentQty > 0 ? 'added' : ''}"
                 onclick="addToCart('${item.itemId}')">
                 ${currentQty > 0 ? '✓' : '+'}
@@ -2021,7 +2017,7 @@
     }
 
     function showThankYouScreen() {
-      const app = document.getElementById('app');
+      const app = document.getElementById('retailer-main');
       if (!app) return;
       app.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:2rem;">
