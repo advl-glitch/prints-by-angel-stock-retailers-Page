@@ -1207,7 +1207,9 @@
 
     function setTagFilter(tagId) {
       activeTagFilter = tagId;
-      filteredItems = tagId ? allItems : [...allItems]; // tag filtering by itemTagsMap would go here
+      filteredItems = tagId
+        ? allItems.filter(item => (item.tags || []).includes(tagId))
+        : [...allItems];
       renderTagFilterBar();
       renderItems();
     }
@@ -1218,10 +1220,12 @@
     function setupToolbar() {
       document.getElementById('search-input')?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase();
-        filteredItems = allItems.filter(item =>
-          item.displayName.toLowerCase().includes(q) ||
-          String(item.itemId).includes(q)
-        );
+        let base = activeTagFilter
+          ? allItems.filter(item => (item.tags || []).includes(activeTagFilter))
+          : allItems;
+        filteredItems = q
+          ? base.filter(item => item.displayName.toLowerCase().includes(q) || String(item.itemId).includes(q))
+          : [...base];
         renderItems();
       });
 
