@@ -27,29 +27,35 @@ const WHOLESALE_PRICES = {
 // doGet — serves retailer.html when visited in a browser,
 // OR returns JSON data when called with ?action=...
 function doGet(e) {
-  const action = e.parameter.action;
+  try {
+    const action = e.parameter.action;
 
-  // If no action param, serve the retailer HTML page
-  if (!action) {
-    return HtmlService
-      .createHtmlOutputFromFile('retailer')
-      .setTitle('Prints by Angel — Retail Partner Stock')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    // If no action param, serve the retailer HTML page
+    if (!action) {
+      return HtmlService
+        .createHtmlOutputFromFile('retailer')
+        .setTitle('Prints by Angel — Retail Partner Stock')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    }
+
+    // Otherwise handle API calls
+    let result;
+    switch (action) {
+      case 'getPublicStock':   result = getPublicStock();                              break;
+      case 'getTags':          result = getTags();                                     break;
+      case 'searchRetailers':  result = searchRetailers(e.parameter.query);            break;
+      default:
+        result = { success: false, error: 'Unknown action: ' + action };
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-
-  // Otherwise handle API calls
-  let result;
-  switch (action) {
-    case 'getPublicStock':   result = getPublicStock();                              break;
-    case 'getTags':          result = getTags();                                     break;
-    case 'searchRetailers':  result = searchRetailers(e.parameter.query);            break;
-    default:
-      result = { success: false, error: 'Unknown action: ' + action };
-  }
-
-  return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // doPost — handles form submissions (verify, submit order, partner request)
@@ -180,7 +186,7 @@ function getPublicStock() {
           status:         item.Status || 'Open',
         };
       })
-      ; // stock filter removed temporarily — add back: .filter(item => item.available > 0)
+      ;
 
     return { success: true, items: stockItems };
   } catch (e) {
